@@ -166,7 +166,7 @@ function do_spectral_analysis(samples)
   local samplesfft={}
   local spectrum={}
   local validnotes={}
-  for i=1,64 do
+  for i=0,63 do
     validnotes[i] = false
   end
   local k,f
