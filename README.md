@@ -3,7 +3,8 @@ Initial stab at building a sampler for digital audio playback in Pico-8.
 
 ARGUMENTS: sample-filename audio-sample-rate outputfile
 
-./pico8_fftsampler samples.txt 44100 outp8.txt
+ex:
+lua pico8_fftsampler samples.txt 44100 outp8.txt
 
 Requires LuaFFT. To install:
 
