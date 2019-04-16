@@ -9,7 +9,7 @@ lua pico8_fftsampler.lua <sample-filename> <sample-rate> <output-filename>
 Ex:
 lua pico8_fftsampler.lua mysample.txt 44100 p8.txt
 
-The input sample is raw linear sample data and can be produced from a source audio file using Audacity, from the Analyze -> Sample Data Export option.
+The input sample is raw linear sample data and can be produced from a source audio file using Audacity, from the Analyze -> Sample Data Export option. Your source audio should probably be prefiltered to allow only frequencies greater than 60Hz and less than 2600Hz, which is the range of frequencies that can be reproduced by the Pico-8.
 
 The output file will contain a Lua array containing slices of 4 channel audio structured as follows:
 {<note1>,<note1 volume>,<note2>,<note2 volume>,<note3>,<note3 volume>,<note4>,<note4 volume>}
@@ -21,7 +21,7 @@ The array can be copied directly into picodigi.p8 (see Git repository) and playe
 --index of p8 musical notes by frequency
 p8_pitches={65.41,69.30,73.42, 77.78,82.41, 87.31, 92.50,98.00,103.83,110.00,116.54,123.47,130.81,138.59,146.83,155.56,164.81,174.61,185.00,196.00,207.65,220.00,233.08,246.94,261.63,277.18,293.66,311.13,329.63,349.23,369.99,392.00,415.30,440.00,466.16,493.88,523.25,554.37,587.33,622.25,659.25,698.46,739.99,783.99,830.61,880.00,932.33,987.77,1046.50,1108.73,1174.66,1244.51,1318.51,1396.91,1479.98,1567.98, 1661.22,1760.00,1864.66,1975.53,2093.00,2217.46,2349.32,2489.02}
 
---Find a Pico-8 note that is closest to the input frequency
+--Finds a Pico-8 note that is closest to the input frequency.
 function find_nearest_p8_note(freq)
   local n,dist=0,9999
   local d
@@ -162,8 +162,11 @@ function do_spectral_analysis(samples)
     end
   end
 
-  --do full analysis first to find valid frequencies
-  --(performing FFT on the smaller slices produces some false positives)
+  --[[
+  First, we do a full analysis to find valid frequencies,
+  as performing FFT on the smaller slices will produces 
+  some false positives.
+  --]]
   local samplesfft={}
   local spectrum={}
   local validnotes={}
@@ -195,8 +198,12 @@ function do_spectral_analysis(samples)
   samplesfft={} -- delete
   print("----------------")
 
-  --do slice analysis and convert to Pico-8 notes
-  --(no Hanning window on individual slices -- "the Hanning)
+  --[[
+  Do slice analysis and convert to Pico-8 notes.
+  We don't apply the Hanning window to individual slices.
+  "The Hanning window is appropriate for continuous signals, 
+  but not for transient ones."
+  ]]--
   local samp_index,samp_end=1
   while samp_index<=#samples do
     samp_end=samp_index+slicesize-1
